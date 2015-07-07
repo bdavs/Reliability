@@ -1,0 +1,18 @@
+{
+    "contents" : "\n#APUC <- c(1)\n#OS <- c(1)\n\n\n#AFF <- (APUC + OS)/APUC\n\n#Bmode_FEF = b mode fix effectiveness factor\nMTTF_Function <- function(Reliability_Investment,C0,Cost_Increment,Amode_fail_rate,Bmode_fail_rate,Bmode_FEF){\n  CV = 1\n  W <- ((C0 + (CV ^ 2 * Reliability_Investment))/Cost_Increment)\n  inv_lambert <- (W * exp(W))\n  MTTF <- 1/(1/(Amode_fail_rate)+1/Bmode_fail_rate*((1-Bmode_FEF)+(Bmode_FEF/(1+(-C0 + Cost_Increment * inv_lambert)/C0))))\n  return(MTTF)\n}\nrepParts <- function(Ttime,MTTF)\n  return(floor(Ttime/MTTF - 0.001))\nCost <- function(MinUnits, initialCost)\n  return(initialCost*(1+MinUnits))\nUnitCost <- function(subsystem1,subsystem2)\n  return(subsystem1+subsystem2)\nUnitInvestment <- function(subsystem1,subsystem2)\n  return(subsystem1+subsystem2)\nNumUnits <- function(Budget,Reliability_Investment,UnitCost)\n  return(floor((Budget - Reliability_Investment)/UnitCost))\n\nRs <- function(Ttime,MTTF){\n  return(exp(-Ttime/MTTF))\n}\nMa <- function(Ttime,MTTF){\n  return(exp(-Ttime/(Ttime - MTTF)))\n}\nA0 <- function(Ttime, MTTF){\n  return(MTTF /Ttime)\n}\nAFF <- function(C0, Cs){\n  return(Cs/C0)\n}",
+    "created" : 1434639373607.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3325430892",
+    "id" : "752B043",
+    "lastKnownWriteTime" : 1436286133,
+    "path" : "~/r/Reliability/main.R",
+    "project_path" : "main.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : true,
+    "type" : "r_source"
+}
