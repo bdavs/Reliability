@@ -1,0 +1,18 @@
+{
+    "contents" : "library(shiny)\n\n# Define UI for application that draws a histogram\nshinyUI(fluidPage(\n  titlePanel(\"Reliability\"),\n  sidebarLayout(\n    sidebarPanel(\n      tabsetPanel(\n        tabPanel(\"subsystem 1\",\n          numericInput('Ttime1', 'Input Total time:', 20000, min = 0, step = 1000),\n          numericInput('Amode_fail_rate1', 'Input A mode Failure Rate:', 1000, step = 100),\n          numericInput('Bmode_fail_rate1', 'Input B mode Failure Rate:', 100, step = 50),\n          numericInput('Bmode_FEF1', 'Input B mode Fix effectiveness factor:', 0.9, step = 0.1,min = 0, max = 1),\n          numericInput('Cost_Increment1', 'cost increment:', 5000000, step = 1000000),\n          sliderInput('Reliability_Investment_input1', 'Input Reliability Investment :', min = 0, max = 60000000,value = 20000000, step = 1000000),\n          numericInput('C01', 'Operating cost:', 1000000, step = 1000000),\n          numericInput('Ci1', 'Initial cost:', 200000, step = 10000),\n          width=3),\n      tabPanel(\"subsystem 2\",\n               numericInput('Ttime2', 'Input Total time:', 20000, min = 0, step = 1000),\n               numericInput('Amode_fail_rate2', 'Input A mode Failure Rate:', 500, step = 100),\n               numericInput('Bmode_fail_rate2', 'Input B mode Failure Rate:', 200, step = 50),\n               numericInput('Bmode_FEF2', 'Input B mode Fix effectiveness factor:', 0.8, step = 0.1,min = 0, max = 1),\n               numericInput('Cost_Increment2', 'cost increment:', 4000000, step = 1000000),\n               sliderInput('Reliability_Investment_input2', 'Input Reliability Investment :', min = 0, max = 60000000,value = 20000000, step = 1000000),\n               numericInput('C02', 'Operating cost:', 800000, step = 1000000),\n               numericInput('Ci2', 'Initial cost:', 75000, step = 10000),\n               width=3),\n      id = \"panelName\")\n      \n      ),\n    \n    # Show a plot of the generated distribution\n    mainPanel(tabsetPanel(\n      \n      tabPanel(\"MTTF\", plotOutput(\"MTTF\",height = \"700px\")),\n      tabPanel(\"Replacement Units\", plotOutput(\"repParts\",height = \"700px\")),\n      tabPanel(\"Cost\", plotOutput(\"Cost\",height = \"700px\")),\n      tabPanel(\"Fleet Size\", plotOutput(\"fleetSize\",height = \"700px\")),\n      #tabPanel(\"Max Fleet Size\", plotOutput(\"maxFleet\",height = \"700px\")),\n      tabPanel(\"Affordability\", plotOutput(\"Aff\",height = \"700px\")),\n      tabPanel(\"Text\", textOutput(\"MTTF_Output\"))\n      )\n    \n  )\n  \n))\n)\n",
+    "created" : 1436176034885.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3713167171",
+    "id" : "DEC7383D",
+    "lastKnownWriteTime" : 1436364198,
+    "path" : "~/r/Reliability/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "type" : "r_source"
+}
