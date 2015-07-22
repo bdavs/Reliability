@@ -30,7 +30,7 @@ shinyUI(fluidPage(
         id = "panelName")
       
     ),
-    
+     
     # Show a plot of the generated distribution
     mainPanel(tabsetPanel(
       

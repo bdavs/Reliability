@@ -54,7 +54,7 @@ shinyServer(function(input, output) {#reactive shiny fuction
     p <- qplot(Reliability()$Reliability_Investment,Reliability()$minunit)
     p 
   })
-  
+   
   #cost per subsystem vs investment
   output$Cost <- renderPlot({ 
     #if(Subsystem()$sub1$Reliability_Investment[length(Subsystem()$sub1$Reliability_Investment)] > Subsystem()$sub2$Reliability_Investment[length(Subsystem()$sub2$Reliability_Investment)]) X <-  Subsystem()$sub1$Reliability_Investment else X <- Subsystem()$sub2$Reliability_Investment

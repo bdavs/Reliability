@@ -27,4 +27,4 @@ A0 <- function(Ttime, MTTF){
 }
 AFF <- function(C0, Cs){
   return(Cs/C0)
-}
+} 
