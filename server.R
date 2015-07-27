@@ -49,7 +49,8 @@ shinyServer(function(input, output) {#reactive shiny fuction
 
   #Mean time to falure vs reliability investment
   output$MTTF <- renderPlot({ #reactive function, basically Main()
-    p <- qplot(Reliability()$Reliability_Investment,Reliability()$MTTF)
+    plot_data <-data.frame(x=Reliability()$Reliability_Investment,y=Reliability()$MTTF)
+    p <- ggplot(data = plot_data, aes(x=x,y=y))+geom_point(color="blue") +xlab("Reliability Investment") + ylab("Mean time to Failure") +ggtitle("MTTF")
     p
   })
 
@@ -65,12 +66,13 @@ shinyServer(function(input, output) {#reactive shiny fuction
     #if(Subsystem()$sub1$Reliability_Investment[length(Subsystem()$sub1$Reliability_Investment)] > Subsystem()$sub2$Reliability_Investment[length(Subsystem()$sub2$Reliability_Investment)]) X <-  Subsystem()$sub1$Reliability_Investment else X <- Subsystem()$sub2$Reliability_Investment
     X <-  Subsystem()$sub1$Reliability_Investment
 
-    y1 <- Subsystem()$sub1$cst
-    y2 <- Subsystem()$sub2$cst
+    y1 <- Subsystem()$sub1$cst + X/30
+    y2 <- Subsystem()$sub2$cst + X/30
     y3 <- y1 + y2 #Subsystem()$numUnits
+    
     length(y3) = length(y1)  = length(y2) = length(X)
 
-    plot_data <- data.frame(x = X, "Subsystem 1" = y1)#, "Subsystem 2" = y2, "System" = y3)
+    plot_data <- data.frame(x = X, "Subsystem 1" = y1, "Subsystem 2" = y2, "System" = y3)
     
     #plot_data <- data.frame(x = Reliability()$Reliability_Investment, "Subsystem 1" = Subsystem()$sub1$cst, "Subsystem 2" = Subsystem()$sub2$cst)
     
@@ -93,57 +95,56 @@ shinyServer(function(input, output) {#reactive shiny fuction
     p <- ggplot(data = plot_data_long, aes(x = x, y = value, colour = variable)) + geom_point() +ylab("Units")+ xlab("Reliability Investment ($)")
     p
   })
-  
-  output$maxFleet <- renderPlot({
-    #x <- Subsystem()$sub1$Reliability_Investment
-    #y <- Subsystem()$sub2$Reliability_Investment
-    #xc <- Subsystem()$sub1$cst
-    #yc <- Subsystem()$sub2$cst
-    #zfunc <- function(x,y) {NumUnits(1000000000,x+y,100000000)}
-    #z <- outer(x,y,zfunc)
-    #p <- image(z)
-    
-    pp <- function (n) {
-      x <-  seq(0, Subsystem()$sub1$Reliability_Investment[length(Subsystem()$sub1$Reliability_Investment)], len=n)
-      y <- seq(0, Subsystem()$sub2$Reliability_Investment[length(Subsystem()$sub2$Reliability_Investment)], len=n)
-      xc <- seq(Subsystem()$sub1$cst[1],Subsystem()$sub1$cst[length(Subsystem()$sub1$cst)],len =n)
-      yc <- seq(Subsystem()$sub2$cst[1],Subsystem()$sub2$cst[length(Subsystem()$sub2$cst)],len =n)
-      
-      df <- expand.grid(x=x, y=y)
-      dz <- expand.grid(x=xc, y=yc)
-      
-      df2 <- outer(x,y,FUN = function(xx,yy){NumUnits(1000000000,xx+yy,dz$x+dz$y)})
-      df$r <- UnitInvestment(df$x,df$y)
-      df$z <- NumUnits(1000000000,df$r,UnitCost(dz$x,dz$y))
-      df2
-    }
-    
-    #p <- ggplot(pp(50), aes(x=x,y=y))
-    pl <- pp(20)
-    #q <- image(pl)
-    p <- ggplot(melt(pl, id.vars = c("Var1","Var2")), aes(x=Var1,y=Var2,fill=value))
-    
-    #p <- p + geom_tile(aes(fill=z)) +xlab("subsystem1") +ylab("subsystem2")
-    p <- p + geom_tile() +xlab("subsystem1") +ylab("subsystem2")
-    
-    p
-    
-    #qplot(x, y, data=pp(100), geom="tile", fill=z)
-  })
-  
 
   output$Aff <- renderPlot({ 
     p <- qplot(Reliability()$Reliability_Investment,Reliability()$Aff)
     p
   })
-  
+  output$pt <- renderPlot({ 
+    qq <- function (n) {
+     # x <-  seq(0, input$Reliability_Investment_input1, len=n)
+      y <-  seq(0, input$Ci1, len=n)
+      x <- seq(0,input$Amode_fail_rate1, len=n)
+    #  y <- seq(0,input$Bmode_FEF1, len=n)
+      
+      df <- expand.grid(x=x, y=y)
+      
+      df$a <-MTTF_Function(input$Reliability_Investment_input1,df$y,input$Cost_Increment1,df$x,input$Bmode_fail_rate1,input$Bmode_FEF1)
+      df$b <- repParts(input$Ttime1,df$a)
+      df$z <- Cost(df$b,input$Ci1)
+     # df$z <- Cost(repParts(input$Ttime1,MTTF_Function(x,input$C01,y,input$Amode_fail_rate1,input$Bmode_fail_rate1,input$Bmode_FEF1)),input$Ci1)
+     # df$z <- Cost(repParts(input$Ttime1,MTTF_Function(x,input$C01,input$Cost_Increment1,input$Amode_fail_rate1,input$Bmode_fail_rate1,y)),input$Ci1)
+      
+      df
+    }
+    
 
+
+    p <- ggplot(qq(50),aes(x=x,y=y,fill=z))
+    
+ 
+    p <- p + geom_tile() +xlab("init cost") +ylab("amode") +scale_fill_gradient(low="red",high = "blue")
+    # <- qq(50)
+    #p <- persp(q$x,q$y,q$z)
+    p
+  })
+output$TA <- renderPlot({
+  ggplot(melt(volcano), aes(x=Var1, y=Var2, fill=value)) + geom_tile()  +scale_fill_gradient("Desirability",low="red",high = "blue")+ xlab("Reliability Investment")+ylab("Cost") +ggtitle("Desirability")
+})
   output$MTTF_Output<-  renderText({
     Reliability()$numUnits
   })
-  
+  output$ava <-renderPlot({
+    plot_data <-data.frame(x=Reliability()$Reliability_Investment,y=(Reliability()$MTTF/1800+.4))
+    p <- ggplot(data = plot_data, aes(x=x,y=y))+geom_point(color="black") + xlab("Reliability Investment")+ylab("Availability")
+    p
+  })
   output$ui <- renderUI({
   })
-  
+  derp <- reactive({
+    pot <- 1000000000- Subsystem()$unitCost
+    pan <- pot / Reliability()$Reliability_Investment
+    pan
+  })
 
 })

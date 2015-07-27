@@ -2,7 +2,7 @@ MTTF_Function <- function(Reliability_Investment,C0,Cost_Increment,Amode_fail_ra
   CV = 1
   W <- C0/Cost_Increment + CV ^ 2 * Reliability_Investment/Cost_Increment
   inv_lambert <- lambertW(C0/Cost_Increment * exp(W))
-  MTTF <- 1/(1/(Amode_fail_rate)+1/Bmode_fail_rate*((1-Bmode_FEF)+(Bmode_FEF/(1+(-C0 + Cost_Increment * inv_lambert)/C0))))
+  MTTF <- 1/(1/Bmode_fail_rate*((1-Bmode_FEF)+(Bmode_FEF/(1+(-C0 + Cost_Increment * inv_lambert)/C0))))
   return(MTTF)
 }
 repParts <- function(Ttime,MTTF)
