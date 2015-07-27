@@ -1,6 +1,6 @@
 library(shiny)#I wonder why this is here?
 library(gdata) #Used for read.xls function
-library(emdbook)
+#library(emdbook)
 library(reshape2)
 library(ggplot2)#ggplot function
 source("main.R")#Source for our reliabilty models
