@@ -20,10 +20,10 @@ UnitInvestment <- function(subsystem1,subsystem2) #total reliability investment 
 NumUnits <- function(Budget,Reliability_Investment,UnitCost) #total number of units able to be purchased based off a fixed budget
   return(floor((Budget - Reliability_Investment) / UnitCost))
 
-Rs <- function(Ttime,MTTF) { #a factor of reliability
+Rs <- function(Ttime,MTTF) { #a factor of reliability, unused
   return(exp(-Ttime / MTTF))
 }
-Ma <- function(Ttime,MTTF) { #a factor of maintainability
+Ma <- function(Ttime,MTTF) { #a factor of maintainability, unused
   return(exp(-Ttime / (Ttime - MTTF)))
 }
 A0 <- function(Ttime, MTTF) { #a factor of availability
