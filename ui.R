@@ -69,7 +69,8 @@ shinyUI(fluidPage(
     tabsetPanel(
       tabPanel("MTTF", plotOutput("MTTF",height = "700px")),
       tabPanel("Replacement Units", plotOutput("repParts",height = "700px")),
-      tabPanel("Cost", plotOutput("Cost",height = "700px")),
+      tabPanel("O&S Cost", plotOutput("OSCost",height = "700px")),
+      tabPanel("Lifecycle Cost", plotOutput("Cost",height = "700px")),
       tabPanel("Fleet Size", plotOutput("fleetSize",height = "700px")),
       #tabPanel("potato", plotOutput("pt",height = "700px")),
       # tabPanel("Max Fleet Size", plotOutput("maxFleet",height = "700px")),

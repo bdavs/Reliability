@@ -69,12 +69,13 @@ shinyServer(function(input, output) {
   output$MTTF <- renderPlot({
     
     plot_data <-
-      data.frame(x = Reliability()$Reliability_Investment,y = Reliability()$MTTF)
+      data.frame(x = Reliability()$Reliability_Investment/1000000,y = Reliability()$MTTF)
     p <-
       ggplot(data = plot_data, aes(x = x,y = y)) + geom_point(color = "blue") +
-      xlab("Reliability Investment ($)") + ylab("Mean time to Failure (hrs)") + ggtitle("MTTF")
-    p <- p + theme(axis.title.y = element_text(size = rel(1), angle = 90)) + theme(axis.title.x = element_text(size = rel(1), angle = 00))
-    p <- p + theme(title = element_text(size = rel(2), angle = 00))
+      xlab("Reliability Investment (millions of $)") + ylab("Mean time to Failure (hrs)") + ggtitle("MTTF")
+    #axis()
+   # p <- p +  scale_x_discrete(labels=paste(plot_data$x, "MM", sep = ""))
+    p <- p + theme(title = element_text(size = rel(1.75)),axis.text = element_text(size=rel(1.25)))
     p
   })
   
@@ -82,7 +83,8 @@ shinyServer(function(input, output) {
   output$repParts <- renderPlot({
     p <-
       qplot(Reliability()$Reliability_Investment,Reliability()$minunit)+ xlab("Reliability Investment ($)") + ylab("Replacement parts") + ggtitle("Replacements")
-    p <- p + theme(axis.title.y = element_text(size = rel(1.8), angle = 90)) + theme(axis.title.x = element_text(size = rel(1.8), angle = 00))
+    p <- p + theme(axis.title.y = element_text(angle = 90))+theme(axis.text.y = element_text(size = rel(1.5)))
+    p <- p + theme(title = element_text(size = rel(2)))
     p
   })
   
@@ -92,8 +94,8 @@ shinyServer(function(input, output) {
     #if(Subsystem()$sub1$Reliability_Investment[length(Subsystem()$sub1$Reliability_Investment)] > Subsystem()$sub2$Reliability_Investment[length(Subsystem()$sub2$Reliability_Investment)]) X <-  Subsystem()$sub1$Reliability_Investment else X <- Subsystem()$sub2$Reliability_Investment
     X <-  Subsystem()$sub1$Reliability_Investment #currently only scaled for subsystem 1,  above statement will pick the larger of the two
     
-    y1 <- Subsystem()$sub1$cst + X / 30  #a scaled reliability investment is added to demonstrate example minima on cost
-    y2 <- Subsystem()$sub2$cst + X / 30
+    y1 <- Subsystem()$sub1$cst + X   #the reliability investment is added to demonstrate minima on cost
+    y2 <- Subsystem()$sub2$cst + X 
     y3 <- y1 + y2 #Subsystem()$numUnits
     
     length(y3) = length(y1)  = length(y2) = length(X)
@@ -108,9 +110,35 @@ shinyServer(function(input, output) {
     plot_data_long <- melt(plot_data, id = "x")
     p <-
       ggplot(data = plot_data_long, aes(x = x, y = value, colour = variable)) + geom_point()  +
-      ylab("Cost ($)") + xlab("Reliability Investment ($)")
-    p <- p + theme(axis.title.y = element_text(size = rel(1.8), angle = 90)) + theme(axis.title.x = element_text(size = rel(1.8), angle = 00))
-   
+      ylab("Lifecycle Cost ($)") + xlab("Reliability Investment ($)") +ggtitle("Lifecycle Cost")
+    p <- p + theme(axis.title.y = element_text(size = rel(1), angle = 90)) + theme(axis.title.x = element_text(size = rel(1)))
+    p <- p + theme(title = element_text(size = rel(2))) + theme(legend.title = element_text(size = rel(.5)))
+    p
+  })
+  #cost per subsystem (and total system) vs investment
+  output$OSCost <- renderPlot({
+    if(Subsystem()$sub1$Reliability_Investment[length(Subsystem()$sub1$Reliability_Investment)] > Subsystem()$sub2$Reliability_Investment[length(Subsystem()$sub2$Reliability_Investment)]) X <-  Subsystem()$sub1$Reliability_Investment else X <- Subsystem()$sub2$Reliability_Investment
+   # X <-  Subsystem()$sub1$Reliability_Investment #currently only scaled for subsystem 1,  above statement will pick the larger of the two
+    
+    y1 <- Subsystem()$sub1$cst 
+    y2 <- Subsystem()$sub2$cst
+    y3 <- y1 + y2 #Subsystem()$numUnits
+    
+    length(y3) = length(y1)  = length(y2) = length(X)
+    #allowing multiple lines be plotted on one graph
+    plot_data <-
+      data.frame(
+        x = X, "Subsystem 1" = y1, "Subsystem 2" = y2, "System" = y3
+      )
+    
+    #plot_data <- data.frame(x = Reliability()$Reliability_Investment, "Subsystem 1" = Subsystem()$sub1$cst, "Subsystem 2" = Subsystem()$sub2$cst)
+    
+    plot_data_long <- melt(plot_data, id = "x")
+    p <-
+      ggplot(data = plot_data_long, aes(x = x, y = value, colour = variable)) + geom_point()  +
+      ylab("O&S Cost ($)") + xlab("Reliability Investment ($)") +ggtitle("O&S Cost")
+    p <- p + theme(axis.title.y = element_text(size = rel(1), angle = 90)) + theme(axis.title.x = element_text(size = rel(1)))
+    p <- p + theme(title = element_text(size = rel(2))) + theme(legend.title = element_text(size = rel(.5)))
     p
   })
   
@@ -133,15 +161,17 @@ shinyServer(function(input, output) {
     
     p <-
       ggplot(data = plot_data_long, aes(x = x, y = value, colour = variable)) + geom_point() +
-      ylab("Units") + xlab("Reliability Investment ($)")
-    p <- p + theme(axis.title.y = element_text(size = rel(1.8), angle = 90)) + theme(axis.title.x = element_text(size = rel(1.8), angle = 00))
+      ylab("Units") + xlab("Reliability Investment ($)") + ggtitle("Fleet size")
+    p <- p + theme(axis.title.y = element_text(size = rel(1), angle = 90)) + theme(axis.title.x = element_text(size = rel(1), angle = 00))
+    p <- p + theme(title = element_text(size = rel(2), angle = 00))+ theme(legend.title = element_text(size = rel(.5)))
     p
   })
   
   #affordability plot
   output$Aff <- renderPlot({
     p <- qplot(Reliability()$Reliability_Investment,Reliability()$Aff) + xlab("Reliability Investment ($)") + ylab("Affordability") + ggtitle("Affordability")
-    p <- p + theme(axis.title.y = element_text(size = rel(1.8), angle = 90)) + theme(axis.title.x = element_text(size = rel(1.8), angle = 00))
+    p <- p + theme(axis.title.y = element_text(size = rel(1), angle = 90)) + theme(axis.title.x = element_text(size = rel(1), angle = 00))
+    p <- p + theme(title = element_text(size = rel(2), angle = 00))
     p
   })
   
@@ -150,7 +180,9 @@ shinyServer(function(input, output) {
     p <- ggplot(melt(volcano), aes(x = Var1, y = Var2, fill = value)) + geom_tile()  +
       scale_fill_gradient("Desirability",low = "red",high = "blue") + xlab("Reliability Investment ($)") +
       ylab("Cost") + ggtitle("Desirability")
-    p <- p + theme(axis.title.y = element_text(size = rel(1.8), angle = 90)) + theme(axis.title.x = element_text(size = rel(1.8), angle = 00))
+    p <- p + theme(axis.title.y = element_text(size = rel(1), angle = 90)) + theme(axis.title.x = element_text(size = rel(1), angle = 00))
+    p <- p + theme(title = element_text(size = rel(2), angle = 00))
+    p
   })
   
   #displays text, not currently used
@@ -164,8 +196,9 @@ shinyServer(function(input, output) {
       data.frame(x = Reliability()$Reliability_Investment,y = (Reliability()$MTTF / input$Ttime1) )
     p <-
       ggplot(data = plot_data, aes(x = x,y = y)) + geom_point(color = "black") + xlab("Reliability Investment ($)") +
-      ylab("System Availability")
-    p <- p + theme(axis.title.y = element_text(size = rel(1.8), angle = 90)) + theme(axis.title.x = element_text(size = rel(1.8), angle = 00))
+      ylab("System Availability") + ggtitle("Availability")
+    p <- p + theme(axis.title.y = element_text(size = rel(1), angle = 90)) + theme(axis.title.x = element_text(size = rel(1), angle = 00))
+    p <- p + theme(title = element_text(size = rel(2), angle = 00))
     p
   })
 
